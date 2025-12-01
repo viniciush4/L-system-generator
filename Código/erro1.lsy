@@ -1,0 +1,4 @@
+angle 8 ; means 360/angle
+order 1 ; 
+axiom F
++ = FF[+FF-FF][FFFFFF][-FF+FF]

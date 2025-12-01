@@ -1,0 +1,4 @@
+angle 10.28 ; means 360/angle
+order 4
+axiom F
+F = F[+FF][-FF]F[-F][+F]F

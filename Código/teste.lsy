@@ -1,0 +1,4 @@
+angle 4 ; means 360/angle
+order 4
+axiom F+F+F+F
+F = FF+F+F+F+FF
