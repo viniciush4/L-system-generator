@@ -1,155 +1,176 @@
-# L-System Generator
+# Interpretador de Sistema Lindenmayer (L-System)
 
-## Autores
+Sistema de interpretação e visualização de gramáticas formais de Lindenmayer, desenvolvido como trabalho acadêmico da disciplina de Estrutura de Dados I.
+
+## 📋 Sobre o Projeto
+
+Este interpretador lê arquivos com especificações de L-Systems (extensão `.lsy`) e gera visualizações gráficas em formato PostScript. O sistema utiliza estruturas de dados hierárquicas (árvores) para armazenar as iterações das regras de produção e implementa um sistema de tartaruga gráfica para renderização.
+
+## 👥 Autores
+
 - Gustavo Costa Duarte
 - Leonardo Nascimento dos Santos
 - Vinícius Berger
 
-## Descrição do Projeto
+**Instituição:** Universidade Federal do Espírito Santo (UFES)  
+**Professor:** Thomas Walter Rauber  
+**Ano:** 2015
 
-Este projeto implementa um **gerador de L-Systems (Lindenmayer Systems)** em C, capaz de produzir fractais e padrões complexos através de regras de substituição recursivas. O programa lê uma especificação de L-System de um arquivo, processa as regras de produção e gera saídas visuais em formato **PostScript**.
+## 🎯 Funcionalidades
 
-### O que são L-Systems?
+- Leitura e parsing de arquivos `.lsy`
+- Aplicação iterativa de regras de produção
+- Geração de árvore de derivação com número variável de filhos
+- Conversão para comandos de tartaruga gráfica
+- Geração de dois arquivos PostScript de saída
+- Tratamento de erros de sintaxe
+- Gerenciamento eficiente de memória
 
-L-Systems são sistemas de reescrita paralela desenvolvidos pelo biólogo Aristid Lindenmayer em 1968, originalmente para modelar o crescimento de plantas. O sistema funciona através de:
-- Um **axioma** (string inicial)
-- **Regras de produção** que substituem símbolos
-- **Iterações** sucessivas aplicando as regras
+## 🏗️ Estrutura do Projeto
 
-## Funcionalidades
-
-### Principais Características
-
-1. **Leitura de Arquivos `.lsy`**: Processa especificações de L-Systems
-2. **Estrutura em Árvore**: Representa as derivações através de uma árvore n-ária
-3. **Geração Recursiva**: Aplica regras de produção por n iterações
-4. **Saída PostScript**: Gera dois tipos de arquivos `.ps`:
-   - Visualização básica do L-System
-   - Visualização com interpretação turtle graphics
-
-### Parâmetros do Sistema
-
-O arquivo de entrada define:
-- `angle`: Ângulo de rotação (360/angle graus)
-- `order`: Número de iterações/derivações
-- `axiom`: String inicial
-- `Regra de produção`: Define como cada símbolo é substituído
-
-## Estrutura do Código
-
-### Estruturas de Dados
-
-```c
-// Árvore n-ária para representar derivações
-typedef struct arvore {
-    char info;           // Símbolo
-    tpArvore *prim;      // Primeiro filho
-    tpArvore *prox;      // Próximo irmão
-} tpArvore;
-
-// Pilha para coordenadas (usado em branches)
-typedef struct pilha {
-    tpLista *prim;
-} tpPilha;
+```
+.
+├── trab2.c           # Programa principal
+├── tad.c             # Implementação das estruturas de dados
+├── tad.h             # Interface do TAD
+├── psinterface.c     # Interface PostScript
+├── psinterface.h     # Cabeçalho da interface PS
+├── lsystem.h         # Definições do L-System
+├── makefile          # Script de compilação
+└── *.lsy             # Arquivos de exemplo
 ```
 
-### Funções Principais
+## 🔧 Compilação e Execução
 
-- `lerArquivo()`: Lê e parseia o arquivo .lsy
-- `criarArvore()`: Cria nós da árvore
-- `criarMaisUmNivel()`: Aplica regras de produção recursivamente
-- `formarStringFinal()`: Percorre a árvore gerando a string resultante
-- `transformaStringFinalEmStringPs()`: Converte para comandos PostScript
+### Requisitos
 
-## Interpretação dos Símbolos
+- GCC (GNU Compiler Collection)
+- Sistema operacional Linux/Unix
+- Biblioteca matemática (`-lm`)
 
-| Símbolo | Significado |
-|---------|-------------|
-| `F` | Desenha linha e avança |
-| `G` | Move sem desenhar |
-| `+` | Rotação positiva |
-| `-` | Rotação negativa |
-| `[` | Salva posição (push) |
-| `]` | Restaura posição (pop) |
-
-## Como Usar
-
-### Compilação
+### Compilar
 
 ```bash
-gcc trab2.c lsystem.c psinterface.c -o lsystem -lm
+make
 ```
 
-### Execução
+Ou manualmente:
 
 ```bash
-./lsystem
+gcc -c tad.c
+gcc -c psinterface.c
+gcc -c trab2.c
+gcc -o trab2 tad.o psinterface.o trab2.o -lm
 ```
 
-O programa solicitará o nome do arquivo `.lsy` (atualmente hardcoded para `teste.lsy`).
+### Executar
 
-### Formato do Arquivo de Entrada
-
-```
-angle 8
-order 1
-axiom F
-F = [++F++F++F[-F][+F][--F][++F][+++F]]
+```bash
+./trab2
 ```
 
-### Saídas Geradas
+O programa solicitará:
+1. Nome do arquivo de entrada (`.lsy`)
+2. Nome do primeiro arquivo de saída (`.ps`)
+3. Nome do segundo arquivo de saída (`.ps`)
 
-- `teste.ps`: Visualização básica
-- `testePs.ps`: Visualização com turtle graphics
+## 📝 Formato do Arquivo de Entrada
 
-## Exemplo de Uso
+Sintaxe de um arquivo `.lsy`:
 
-Com o arquivo `teste.lsy` fornecido:
-- **Ângulo**: 8 (45° de rotação)
-- **Ordem**: 1 iteração
-- **Axioma**: F
-- **Regra**: F expande para uma estrutura com múltiplos branches
-
-## Constantes Configuráveis
-
-```c
-#define z 50              // Tamanho do passo
-#define PI 3.14159265359  // Valor de π
-#define T 300             // Tamanho máximo de strings
-#define rotacao 0.00      // Rotação inicial
+```
+angle <número>    ; Ângulo de rotação (360/n graus)
+order <número>    ; Número de iterações
+axiom <string>    ; String inicial (ordem 0)
+<char> = <string> ; Regra de produção
 ```
 
-## Limitações Conhecidas
+### Exemplo
 
-- String final pode ter problemas com última posição da pilha
-- Validação limitada de caracteres especiais
-- Apenas aceita caracteres maiúsculos (preparação para parte II)
-- Tamanho máximo de instruções PostScript definido estaticamente
+```
+angle 8           ; means 360/8
+order 3
+axiom ++F
+F = F+F
+```
 
-## Dependências
+### Símbolos de Tartaruga Gráfica
 
-- `lsystem.h`: Funções específicas do L-System
-- `psinterface.h`: Interface para geração PostScript
-- Bibliotecas padrão: `stdio.h`, `stdlib.h`, `string.h`, `math.h`
+| Símbolo | Descrição |
+|---------|-----------|
+| `F` | Mover com caneta baixada (desenha) |
+| `G` | Mover com caneta levantada (não desenha) |
+| `+` | Rotacionar por ângulo positivo |
+| `-` | Rotacionar por ângulo negativo |
+| `[` | Empilhar estado da tartaruga |
+| `]` | Desempilhar estado da tartaruga |
 
-## Melhorias Futuras
+## 🌳 Estruturas de Dados
 
-- [ ] Corrigir problema na geração da string final
-- [ ] Organizar como tipo abstrato de dados (TAD)
-- [ ] Melhorar validação de entrada
-- [ ] Documentação completa
-- [ ] Refatoração de nomes de variáveis
-- [ ] Tratamento de erros mais robusto
+### Árvore
+Estrutura hierárquica com número variável de filhos que armazena:
+- Raiz: símbolo a ser substituído
+- Níveis intermediários: iterações da regra
+- Folhas: string final do L-System
 
-## Aplicações
+### Pilha
+Utilizada para gerenciar o estado da tartaruga (posição e orientação) durante o desenho, permitindo ramificações através dos comandos `[` e `]`.
 
-L-Systems são amplamente utilizados para:
-- Modelagem de plantas e vegetação
-- Geração procedural de terrenos
-- Arte fractal e generativa
-- Simulação de crescimento biológico
-- Computer graphics
+## 📊 Exemplos Incluídos
 
-## Licença
+- `helloworld.lsy` - Exemplo básico
+- `helloworld1.lsy` - Árvore fractal simples
+- `helloworld2.lsy` - Curva de Koch
+- `helloworld3.lsy` - Padrão com ramificações
+- `teste.lsy` - Quadrado de Koch
+- `teste1.lsy` - Planta fractal
+- `teste2.lsy` - Floco de neve
 
-Projeto acadêmico - uso educacional.
+## ⚠️ Tratamento de Erros
+
+O sistema detecta e reporta:
+- Arquivo de entrada não encontrado
+- Valor de ângulo ausente ou inválido
+- Valor de ordem ausente ou inválido
+- Informações faltantes no arquivo
+- Instância de substituição inválida
+
+Caracteres não permitidos como instância: `=`, `+`, `-`, `!`, `|`, `[`, `]`, `<`, `>`, `@`, `/`, `\`, `_`, `c`, espaço
+
+## 🔍 Verificação de Memória
+
+O projeto foi testado com Valgrind para garantir:
+- Ausência de vazamentos de memória
+- Liberação adequada de recursos alocados
+- Gerenciamento correto de ponteiros
+
+```bash
+valgrind --leak-check=full ./trab2
+```
+
+## 📐 Algoritmo de Renderização
+
+A conversão da string final para PostScript utiliza:
+
+```
+x1 = x0 + z * cos(α)
+y1 = y0 + z * sin(α)
+```
+
+Onde:
+- `z` = comprimento do traço (70 unidades)
+- `α` = orientação atual da tartaruga
+- `(x0, y0)` = posição inicial
+- `(x1, y1)` = posição final
+
+## 📚 Referências
+
+CELES, Waldemar; CERQUEIRA, Renato; RANGEL, José Lucas. **Introdução a estruturas de dados: com técnicas de programação em C**. 11ª triagem. Rio de Janeiro: Elsevier, 2004.
+
+## 📄 Licença
+
+Projeto acadêmico desenvolvido para fins educacionais na UFES.
+
+---
+
+**Nota:** Este projeto foi desenvolvido em 2015 como parte do curso de Ciência da Computação da UFES.
